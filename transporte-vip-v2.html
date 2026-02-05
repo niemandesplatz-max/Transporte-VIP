@@ -1620,14 +1620,23 @@
         // ==========================================
         // TABS Y NAVEGACIÓN
         // ==========================================
-        function switchTab(tab) {
-            // Remove active from all tabs
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            // Add active to selected
-            event.target.classList.add('active');
-            document.getElementById(tab + '-tab').classList.add('active');
+       // Add active to selected button (safely)
+if (ev && ev.currentTarget) {
+    ev.currentTarget.classList.add('active');
+} else if (ev && ev.target) {
+    // If called from inline onclick the target may be a child node; find nearest button
+    let btn = ev.target;
+    while (btn && !btn.classList.contains('tab-btn')) {
+        btn = btn.parentElement;
+    }
+    if (btn) btn.classList.add('active');
+} else {
+    // Fallback: activate by ID if exists
+    const fallbackBtn = document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+    if (fallbackBtn) fallbackBtn.classList.add('active');
+}
+const content = document.getElementById(tab + '-tab');
+if (content) content.classList.add('active');
         }
 
         // ==========================================

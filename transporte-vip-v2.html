@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transporte VIP - Servicio de Transporte Ejecutivo en Panamá</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&libraries=places&callback=initMap" async defer></script>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #c5a572;
+            --accent: #ecc94b;
+            --light: #f8f9fa;
+            --dark: #0f0f1e;
+            --shadow: rgba(197, 165, 114, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header Styles */
+        header {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--secondary);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo-placeholder {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--dark);
+            box-shadow: 0 4px 15px rgba(197, 165, 114, 0.4);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+        }
+
+        .tagline {
+            font-size: 0.9rem;
+            color: var(--secondary);
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 0.3rem;
+        }
+
+        .lang-switch {
+            background: var(--secondary);
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 25px;
+            color: var(--dark);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .lang-switch:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(197, 165, 114, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 500px;
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+
+        .carousel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+        }
+
+        .carousel-slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.7), rgba(15, 15, 30, 0.5));
+        }
+
+        .hero-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 10;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        .hero-content h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: var(--light);
+            font-weight: 300;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        /* Section Styles */
+        .section {
+            margin-bottom: 4rem;
+            background: rgba(26, 26, 46, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(197, 165, 114, 0.2);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--secondary);
+            text-align: center;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        /* Map Container */
+        .map-container {
+            margin: 2rem 0;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid rgba(197, 165, 114, 0.3);
+        }
+
+        #map {
+            width: 100%;
+            height: 400px;
+        }
+
+        .location-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .location-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.8rem;
+            background: rgba(197, 165, 114, 0.2);
+            border: 2px solid var(--secondary);
+            border-radius: 10px;
+            color: var(--light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .location-btn:hover {
+            background: var(--secondary);
+            color: var(--dark);
+            transform: translateY(-2px);
+        }
+
+        .location-btn.active {
+            background: var(--accent);
+            color: var(--dark);
+        }
+
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+            font-weight: 500;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+        }
+
+        input, select, textarea {
+            padding: 1rem;
+            border: 2px solid rgba(197, 165, 114, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 20px rgba(197, 165, 114, 0.2);
+        }
+
+        input::placeholder {
+            color: rgba(248, 249, 250, 0.4);
+        }
+
+        input[readonly] {
+            background: rgba(197, 165, 114, 0.1);
+            cursor: not-allowed;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            color: var(--dark);
+            box-shadow: 0 4px 15px rgba(197, 165, 114, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(197, 165, 114, 0.5);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--secondary);
+            color: var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondary);
+            color: var(--dark);
+            transform: translateY(-3px);
+        }
+
+        /* Services Tabs */
+        .services-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: rgba(197, 165, 114, 0.2);
+            border: 2px solid var(--secondary);
+            border-radius: 15px;
+            color: var(--light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .tab-btn:hover {
+            background: rgba(197, 165, 114, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background: var(--secondary);
+            color: var(--dark);
+            box-shadow: 0 4px 15px rgba(197, 165, 114, 0.4);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Services Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .service-card {
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(15, 15, 30, 0.6));
+            border: 2px solid rgba(197, 165, 114, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--secondary);
+            box-shadow: 0 12px 40px rgba(197, 165, 114, 0.3);
+        }
+
+        .service-card.selected {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, rgba(236, 201, 75, 0.2), rgba(197, 165, 114, 0.2));
+        }
+
+        .service-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        .service-card .price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 1rem 0;
+        }
+
+        .service-card .description {
+            color: rgba(248, 249, 250, 0.8);
+            margin-bottom: 1rem;
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+
+        .service-card .additional-info {
+            font-size: 0.85rem;
+            color: rgba(248, 249, 250, 0.6);
+            font-style: italic;
+        }
+
+        /* Checkbox Styles */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin: 1.5rem 0;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: var(--secondary);
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        /* Service Options in Modal */
+        .service-options {
+            display: grid;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .service-option {
+            background: rgba(197, 165, 114, 0.1);
+            border: 2px solid rgba(197, 165, 114, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .service-option:hover {
+            border-color: var(--secondary);
+            background: rgba(197, 165, 114, 0.2);
+        }
+
+        .service-option.selected {
+            border-color: var(--accent);
+            background: rgba(236, 201, 75, 0.2);
+        }
+
+        .service-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent);
+        }
+
+        .service-option-content {
+            flex: 1;
+        }
+
+        .service-option-title {
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 0.3rem;
+        }
+
+        .service-option-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .service-option-details {
+            font-size: 0.85rem;
+            color: rgba(248, 249, 250, 0.7);
+        }
+
+        /* Price Summary Box */
+        .price-summary {
+            background: linear-gradient(135deg, rgba(197, 165, 114, 0.15), rgba(236, 201, 75, 0.15));
+            border: 2px solid var(--secondary);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(197, 165, 114, 0.2);
+        }
+
+        .price-row:last-child {
+            border-bottom: none;
+            margin-top: 0.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--secondary);
+        }
+
+        .price-label {
+            color: var(--light);
+            font-weight: 500;
+        }
+
+        .price-value {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .total-price {
+            font-size: 1.5rem !important;
+            color: var(--secondary) !important;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            margin: 2% auto;
+            padding: 3rem;
+            border: 2px solid var(--secondary);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.4s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close {
+            color: var(--secondary);
+            float: right;
+            font-size: 2.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: var(--accent);
+            transform: rotate(90deg);
+        }
+
+        /* Payment Methods */
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .payment-option {
+            padding: 1rem;
+            border: 2px solid rgba(197, 165, 114, 0.3);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .payment-option:hover {
+            border-color: var(--secondary);
+            background: rgba(197, 165, 114, 0.1);
+        }
+
+        .payment-option.selected {
+            border-color: var(--accent);
+            background: rgba(236, 201, 75, 0.2);
+        }
+
+        .payment-option input[type="radio"] {
+            display: none;
+        }
+
+        .payment-option label {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--light);
+            margin: 0;
+        }
+
+        /* Success Message */
+        .success-message {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(56, 142, 60, 0.2));
+            border: 2px solid #4caf50;
+            color: #4caf50;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero-content h2 {
+                font-size: 2rem;
+            }
+
+            .section {
+                padding: 2rem 1.5rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .services-tabs {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                width: 100%;
+            }
+
+            .modal-content {
+                padding: 2rem 1.5rem;
+                margin: 5% auto;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(197, 165, 114, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--secondary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-placeholder">🚗</div>
+                <div>
+                    <h1 id="mainTitle">TRANSPORTE VIP</h1>
+                    <p class="tagline" id="tagline">Elegancia en cada viaje</p>
+                </div>
+            </div>
+            <button class="lang-switch" onclick="toggleLanguage()">
+                <span id="langButton">English</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Carousel -->
+    <div class="hero">
+        <div class="carousel" id="carousel">
+            <div class="carousel-slide active" style="background-image: linear-gradient(135deg, rgba(26, 26, 46, 0.7), rgba(15, 15, 30, 0.5)), url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221920%22 height=%22500%22%3E%3Crect fill=%22%231a1a2e%22 width=%221920%22 height=%22500%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2230%22 fill=%22%23c5a572%22%3EImagen de Ciudad de Panamá%3C/text%3E%3C/svg%3E');"></div>
+            <div class="carousel-slide" style="background-image: linear-gradient(135deg, rgba(26, 26, 46, 0.7), rgba(15, 15, 30, 0.5)), url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221920%22 height=%22500%22%3E%3Crect fill=%22%230f0f1e%22 width=%221920%22 height=%22500%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2230%22 fill=%22%23ecc94b%22%3ECliente Satisfecho%3C/text%3E%3C/svg%3E');"></div>
+            <div class="carousel-slide" style="background-image: linear-gradient(135deg, rgba(26, 26, 46, 0.7), rgba(15, 15, 30, 0.5)), url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221920%22 height=%22500%22%3E%3Crect fill=%22%231a1a2e%22 width=%221920%22 height=%22500%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2230%22 fill=%22%23c5a572%22%3EVehículo de Lujo%3C/text%3E%3C/svg%3E');"></div>
+        </div>
+        <div class="hero-content">
+            <h2 id="heroTitle">Viaja con Estilo y Seguridad</h2>
+            <p id="heroSubtitle">Servicio de transporte ejecutivo en todo Panamá</p>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Trip Quote Section with Maps -->
+        <section class="section">
+            <h2 class="section-title" id="quoteTitle">Cotizar Viaje</h2>
+            
+            <div class="map-container">
+                <div id="map"></div>
+            </div>
+
+            <div class="location-buttons">
+                <button class="location-btn" id="setPickupBtn" onclick="setLocationMode('pickup')">
+                    📍 <span id="setPickupText">Establecer Punto de Recogida</span>
+                </button>
+                <button class="location-btn" id="setDestBtn" onclick="setLocationMode('destination')">
+                    🎯 <span id="setDestText">Establecer Destino</span>
+                </button>
+                <button class="location-btn" onclick="useMyLocation()">
+                    📱 <span id="useLocationText">Usar Mi Ubicación</span>
+                </button>
+            </div>
+
+            <form id="quoteForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="pickupLocation" id="pickupLabel">Ubicación de Recogida</label>
+                        <input type="text" id="pickupLocation" required placeholder="Seleccione en el mapa o escriba aquí" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="destination" id="destinationLabel">Ubicación de Destino</label>
+                        <input type="text" id="destination" required placeholder="Seleccione en el mapa o escriba aquí" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="tripDate" id="dateLabel">Fecha del Viaje</label>
+                        <input type="date" id="tripDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tripTime" id="timeLabel">Hora del Viaje</label>
+                        <input type="time" id="tripTime" required>
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <button type="submit" class="btn btn-primary" id="quoteButton">
+                        <span id="quoteButtonText">Cotizar Ahora</span>
+                    </button>
+                </div>
+            </form>
+
+            <div id="quoteResult" class="price-summary" style="display: none;">
+                <h3 style="color: var(--secondary); text-align: center; margin-bottom: 1rem;" id="estimateTitle">Estimado del Viaje</h3>
+                <div class="price-row">
+                    <span class="price-label" id="distanceLabel">Distancia:</span>
+                    <span class="price-value" id="distanceValue">0 km</span>
+                </div>
+                <div class="price-row">
+                    <span class="price-label" id="durationLabel">Duración estimada:</span>
+                    <span class="price-value" id="durationValue">0 min</span>
+                </div>
+                <div class="price-row">
+                    <span class="price-label" id="priceLabel">Precio estimado:</span>
+                    <span class="price-value total-price" id="priceDisplay">$0.00</span>
+                </div>
+                <p style="font-size: 0.85rem; color: rgba(248, 249, 250, 0.7); margin-top: 1rem; text-align: center;" id="disclaimer">
+                    * Este es un costo estimado. El precio final puede variar debido a tiempo de espera, 
+                    tráfico, peajes u otros factores.
+                </p>
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <button class="btn btn-secondary" onclick="showBookingForm('regular')" id="scheduleButton">
+                        <span id="scheduleButtonText">Agendar Viaje</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section class="section">
+            <h2 class="section-title" id="servicesTitle">Nuestros Servicios</h2>
+            
+            <div class="services-tabs">
+                <button class="tab-btn active" onclick="switchTab('airport')" id="tabAirport">
+                    ✈️ Aeropuerto
+                </button>
+                <button class="tab-btn" onclick="switchTab('panoramic')" id="tabPanoramic">
+                    🏝️ Panorámicos
+                </button>
+                <button class="tab-btn" onclick="switchTab('local')" id="tabLocal">
+                    🏙️ Locales
+                </button>
+            </div>
+
+            <!-- Airport Services -->
+            <div id="airport-tab" class="tab-content active">
+                <div class="services-grid" id="airportServices"></div>
+            </div>
+
+            <!-- Panoramic Services -->
+            <div id="panoramic-tab" class="tab-content">
+                <div class="services-grid" id="panoramicServices"></div>
+            </div>
+
+            <!-- Local Services -->
+            <div id="local-tab" class="tab-content">
+                <div class="services-grid" id="localServices"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeBookingModal()">&times;</span>
+            <h2 class="section-title" id="modalTitle">Agendar Servicio</h2>
+            
+            <div id="serviceSelectionSection" class="hidden">
+                <h3 style="color: var(--secondary); margin-bottom: 1rem;" id="selectServiceTitle">Seleccione el Servicio</h3>
+                <div id="serviceOptionsContainer" class="service-options"></div>
+            </div>
+
+            <form id="bookingForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="firstName" id="firstNameLabel">Nombre</label>
+                        <input type="text" id="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName" id="lastNameLabel">Apellido</label>
+                        <input type="text" id="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone" id="phoneInputLabel">Número de Teléfono</label>
+                        <input type="tel" id="phone" required placeholder="+507">
+                    </div>
+                    <div class="form-group">
+                        <label for="email" id="emailLabel">Correo Electrónico</label>
+                        <input type="email" id="email" required>
+                    </div>
+                </div>
+
+                <div id="peopleCountSection" class="form-group hidden">
+                    <label for="peopleCount" id="peopleCountLabel">Número de Personas</label>
+                    <input type="number" id="peopleCount" min="1" value="1" onchange="calculateTotal()">
+                </div>
+
+                <div id="additionalPeopleSection" class="form-group hidden">
+                    <label for="additionalPeople" id="additionalPeopleLabel">Personas Adicionales (más de 2)</label>
+                    <input type="number" id="additionalPeople" min="0" value="0" onchange="calculateTotal()">
+                </div>
+
+                <div class="form-group">
+                    <label id="paymentMethodLabel">Método de Pago</label>
+                    <div class="payment-methods">
+                        <div class="payment-option">
+                            <input type="radio" name="paymentMethod" id="cash" value="Efectivo" required>
+                            <label for="cash" id="cashLabel">Efectivo</label>
+                        </div>
+                        <div class="payment-option">
+                            <input type="radio" name="paymentMethod" id="yappy" value="Yappy">
+                            <label for="yappy">Yappy</label>
+                        </div>
+                        <div class="payment-option">
+                            <input type="radio" name="paymentMethod" id="debit" value="Tarjeta de Débito">
+                            <label for="debit" id="debitLabel">Débito</label>
+                        </div>
+                        <div class="payment-option">
+                            <input type="radio" name="paymentMethod" id="credit" value="Tarjeta de Crédito">
+                            <label for="credit" id="creditLabel">Crédito</label>
+                        </div>
+                        <div class="payment-option">
+                            <input type="radio" name="paymentMethod" id="clave" value="Clave">
+                            <label for="clave">Clave</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="needsInvoice" onchange="toggleInvoiceFields()">
+                    <label for="needsInvoice" id="invoiceLabel">Necesito factura fiscal (+7% ITBMS)</label>
+                </div>
+
+                <div id="invoiceFields" class="hidden">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="ruc" id="rucLabel">RUC (Cédula)</label>
+                            <input type="text" id="ruc">
+                        </div>
+                        <div class="form-group">
+                            <label for="dv" id="dvLabel">DV</label>
+                            <input type="text" id="dv" maxlength="2">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="priceSummaryModal" class="price-summary">
+                    <div class="price-row">
+                        <span class="price-label" id="basePriceLabel">Precio Base:</span>
+                        <span class="price-value" id="basePriceValue">$0.00</span>
+                    </div>
+                    <div class="price-row" id="extraPeopleRow" style="display: none;">
+                        <span class="price-label" id="extraPeopleLabel">Personas Adicionales:</span>
+                        <span class="price-value" id="extraPeopleValue">$0.00</span>
+                    </div>
+                    <div class="price-row" id="subtotalRow">
+                        <span class="price-label" id="subtotalLabel">Subtotal:</span>
+                        <span class="price-value" id="subtotalValue">$0.00</span>
+                    </div>
+                    <div class="price-row" id="itbmsRow" style="display: none;">
+                        <span class="price-label" id="itbmsLabel">ITBMS (7%):</span>
+                        <span class="price-value" id="itbmsValue">$0.00</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label" id="totalLabel">Total:</span>
+                        <span class="price-value total-price" id="totalValue">$0.00</span>
+                    </div>
+                </div>
+
+                <div class="success-message" id="successMessage"></div>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary" id="submitButton">
+                        <span id="submitButtonText">Confirmar Reserva</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // CONFIGURACIÓN Y VARIABLES GLOBALES
+        // ==========================================
+        let map;
+        let pickupMarker;
+        let destinationMarker;
+        let pickupCoords = null;
+        let destinationCoords = null;
+        let currentLocationMode = null;
+        let currentLang = 'es';
+        let currentService = null;
+        let currentServiceType = null;
+        let selectedServiceOption = null;
+        let directionsService;
+        let directionsRenderer;
+
+        // Servicios de Aeropuerto (8 opciones)
+        const airportServices = {
+            es: [
+                { id: 'a1', name: 'Aeropuerto a Ciudad (Centro)', price: 45, extraPerson: 5, maxBase: 2 },
+                { id: 'a2', name: 'Aeropuerto a Costa del Este', price: 40, extraPerson: 5, maxBase: 2 },
+                { id: 'a3', name: 'Aeropuerto a Punta Pacífica', price: 48, extraPerson: 5, maxBase: 2 },
+                { id: 'a4', name: 'Aeropuerto a Albrook', price: 42, extraPerson: 5, maxBase: 2 },
+                { id: 'a5', name: 'Aeropuerto a Coronado', price: 80, extraPerson: 5, maxBase: 2 },
+                { id: 'a6', name: 'Aeropuerto a Playa Bonita', price: 65, extraPerson: 5, maxBase: 2 },
+                { id: 'a7', name: 'Aeropuerto a Zona Oeste', price: 50, extraPerson: 5, maxBase: 2 },
+                { id: 'a8', name: 'Aeropuerto a Hoteles Zona Bancaria', price: 47, extraPerson: 5, maxBase: 2 }
+            ],
+            en: [
+                { id: 'a1', name: 'Airport to City (Downtown)', price: 45, extraPerson: 5, maxBase: 2 },
+                { id: 'a2', name: 'Airport to Costa del Este', price: 40, extraPerson: 5, maxBase: 2 },
+                { id: 'a3', name: 'Airport to Punta Pacífica', price: 48, extraPerson: 5, maxBase: 2 },
+                { id: 'a4', name: 'Airport to Albrook', price: 42, extraPerson: 5, maxBase: 2 },
+                { id: 'a5', name: 'Airport to Coronado', price: 80, extraPerson: 5, maxBase: 2 },
+                { id: 'a6', name: 'Airport to Playa Bonita', price: 65, extraPerson: 5, maxBase: 2 },
+                { id: 'a7', name: 'Airport to West Zone', price: 50, extraPerson: 5, maxBase: 2 },
+                { id: 'a8', name: 'Airport to Banking Area Hotels', price: 47, extraPerson: 5, maxBase: 2 }
+            ]
+        };
+
+        // Servicios Panorámicos (10 opciones)
+        const panoramicServices = {
+            es: [
+                { id: 'p1', name: 'City Tour Panamá', price: 80, extraPerson: 5, maxBase: 2, duration: '4h' },
+                { id: 'p2', name: 'Canal de Panamá + Casco Viejo', price: 100, extraPerson: 5, maxBase: 2, duration: '5h' },
+                { id: 'p3', name: 'Playas del Pacífico', price: 150, extraPerson: 5, maxBase: 2, duration: '8h' },
+                { id: 'p4', name: 'Isla Taboga', price: 120, extraPerson: 5, maxBase: 2, duration: '6h' },
+                { id: 'p5', name: 'Gamboa Rainforest', price: 140, extraPerson: 5, maxBase: 2, duration: '7h' },
+                { id: 'p6', name: 'Volcán Barú (Boquete)', price: 280, extraPerson: 5, maxBase: 2, duration: '2 días' },
+                { id: 'p7', name: 'Portobelo + San Lorenzo', price: 160, extraPerson: 5, maxBase: 2, duration: '8h' },
+                { id: 'p8', name: 'Valle de Antón', price: 180, extraPerson: 5, maxBase: 2, duration: '8h' },
+                { id: 'p9', name: 'Emberá Village', price: 200, extraPerson: 5, maxBase: 2, duration: '9h' },
+                { id: 'p10', name: 'Tour Personalizado', price: 120, extraPerson: 5, maxBase: 2, duration: 'Variable' }
+            ],
+            en: [
+                { id: 'p1', name: 'Panama City Tour', price: 80, extraPerson: 5, maxBase: 2, duration: '4h' },
+                { id: 'p2', name: 'Panama Canal + Casco Viejo', price: 100, extraPerson: 5, maxBase: 2, duration: '5h' },
+                { id: 'p3', name: 'Pacific Beaches', price: 150, extraPerson: 5, maxBase: 2, duration: '8h' },
+                { id: 'p4', name: 'Taboga Island', price: 120, extraPerson: 5, maxBase: 2, duration: '6h' },
+                { id: 'p5', name: 'Gamboa Rainforest', price: 140, extraPerson: 5, maxBase: 2, duration: '7h' },
+                { id: 'p6', name: 'Volcán Barú (Boquete)', price: 280, extraPerson: 5, maxBase: 2, duration: '2 days' },
+                { id: 'p7', name: 'Portobelo + San Lorenzo', price: 160, extraPerson: 5, maxBase: 2, duration: '8h' },
+                { id: 'p8', name: 'Valle de Antón', price: 180, extraPerson: 5, maxBase: 2, duration: '8h' },
+                { id: 'p9', name: 'Emberá Village', price: 200, extraPerson: 5, maxBase: 2, duration: '9h' },
+                { id: 'p10', name: 'Custom Tour', price: 120, extraPerson: 5, maxBase: 2, duration: 'Variable' }
+            ]
+        };
+
+        // Servicios Locales (6 opciones - precio por persona)
+        const localServices = {
+            es: [
+                { id: 'l1', name: 'Alquiler por Hora', pricePerPerson: 25, minPeople: 1 },
+                { id: 'l2', name: 'Medio Día (4 horas)', pricePerPerson: 80, minPeople: 1 },
+                { id: 'l3', name: 'Día Completo (8 horas)', pricePerPerson: 150, minPeople: 1 },
+                { id: 'l4', name: 'Servicio Corporativo (Día)', pricePerPerson: 180, minPeople: 1 },
+                { id: 'l5', name: 'Eventos Especiales', pricePerPerson: 200, minPeople: 1 },
+                { id: 'l6', name: 'Traslado Local (Ida/Vuelta)', pricePerPerson: 35, minPeople: 1 }
+            ],
+            en: [
+                { id: 'l1', name: 'Hourly Rental', pricePerPerson: 25, minPeople: 1 },
+                { id: 'l2', name: 'Half Day (4 hours)', pricePerPerson: 80, minPeople: 1 },
+                { id: 'l3', name: 'Full Day (8 hours)', pricePerPerson: 150, minPeople: 1 },
+                { id: 'l4', name: 'Corporate Service (Day)', pricePerPerson: 180, minPeople: 1 },
+                { id: 'l5', name: 'Special Events', pricePerPerson: 200, minPeople: 1 },
+                { id: 'l6', name: 'Local Transfer (Round Trip)', pricePerPerson: 35, minPeople: 1 }
+            ]
+        };
+
+        // Traducciones
+        const translations = {
+            es: {
+                mainTitle: "TRANSPORTE VIP",
+                tagline: "Elegancia en cada viaje",
+                langButton: "English",
+                heroTitle: "Viaja con Estilo y Seguridad",
+                heroSubtitle: "Servicio de transporte ejecutivo en todo Panamá",
+                quoteTitle: "Cotizar Viaje",
+                setPickupText: "Establecer Punto de Recogida",
+                setDestText: "Establecer Destino",
+                useLocationText: "Usar Mi Ubicación",
+                pickupLabel: "Ubicación de Recogida",
+                destinationLabel: "Ubicación de Destino",
+                dateLabel: "Fecha del Viaje",
+                timeLabel: "Hora del Viaje",
+                quoteButtonText: "Cotizar Ahora",
+                estimateTitle: "Estimado del Viaje",
+                distanceLabel: "Distancia:",
+                durationLabel: "Duración estimada:",
+                priceLabel: "Precio estimado:",
+                disclaimer: "* Este es un costo estimado. El precio final puede variar debido a tiempo de espera, tráfico, peajes u otros factores.",
+                scheduleButtonText: "Agendar Viaje",
+                servicesTitle: "Nuestros Servicios",
+                tabAirport: "✈️ Aeropuerto",
+                tabPanoramic: "🏝️ Panorámicos",
+                tabLocal: "🏙️ Locales",
+                modalTitle: "Agendar Servicio",
+                selectServiceTitle: "Seleccione el Servicio",
+                firstNameLabel: "Nombre",
+                lastNameLabel: "Apellido",
+                phoneInputLabel: "Número de Teléfono",
+                emailLabel: "Correo Electrónico",
+                peopleCountLabel: "Número de Personas",
+                additionalPeopleLabel: "Personas Adicionales (más de 2)",
+                paymentMethodLabel: "Método de Pago",
+                cashLabel: "Efectivo",
+                debitLabel: "Débito",
+                creditLabel: "Crédito",
+                invoiceLabel: "Necesito factura fiscal (+7% ITBMS)",
+                rucLabel: "RUC (Cédula)",
+                dvLabel: "DV",
+                basePriceLabel: "Precio Base:",
+                extraPeopleLabel: "Personas Adicionales:",
+                subtotalLabel: "Subtotal:",
+                itbmsLabel: "ITBMS (7%):",
+                totalLabel: "Total:",
+                submitButtonText: "Confirmar Reserva"
+            },
+            en: {
+                mainTitle: "VIP TRANSPORT",
+                tagline: "Elegance in every journey",
+                langButton: "Español",
+                heroTitle: "Travel with Style and Safety",
+                heroSubtitle: "Executive transportation service throughout Panama",
+                quoteTitle: "Get a Quote",
+                setPickupText: "Set Pickup Point",
+                setDestText: "Set Destination",
+                useLocationText: "Use My Location",
+                pickupLabel: "Pickup Location",
+                destinationLabel: "Destination",
+                dateLabel: "Trip Date",
+                timeLabel: "Trip Time",
+                quoteButtonText: "Get Quote",
+                estimateTitle: "Trip Estimate",
+                distanceLabel: "Distance:",
+                durationLabel: "Estimated duration:",
+                priceLabel: "Estimated price:",
+                disclaimer: "* This is an estimated cost. The final price may vary due to waiting time, traffic, tolls, or other factors.",
+                scheduleButtonText: "Schedule Trip",
+                servicesTitle: "Our Services",
+                tabAirport: "✈️ Airport",
+                tabPanoramic: "🏝️ Panoramic",
+                tabLocal: "🏙️ Local",
+                modalTitle: "Schedule Service",
+                selectServiceTitle: "Select Service",
+                firstNameLabel: "First Name",
+                lastNameLabel: "Last Name",
+                phoneInputLabel: "Phone Number",
+                emailLabel: "Email",
+                peopleCountLabel: "Number of People",
+                additionalPeopleLabel: "Additional People (more than 2)",
+                paymentMethodLabel: "Payment Method",
+                cashLabel: "Cash",
+                debitLabel: "Debit",
+                creditLabel: "Credit",
+                invoiceLabel: "I need a tax invoice (+7% ITBMS)",
+                rucLabel: "RUC (ID)",
+                dvLabel: "DV",
+                basePriceLabel: "Base Price:",
+                extraPeopleLabel: "Additional People:",
+                subtotalLabel: "Subtotal:",
+                itbmsLabel: "ITBMS (7%):",
+                totalLabel: "Total:",
+                submitButtonText: "Confirm Reservation"
+            }
+        };
+
+        // ==========================================
+        // INICIALIZACIÓN DE GOOGLE MAPS
+        // ==========================================
+        function initMap() {
+            // Centrar en Ciudad de Panamá
+            const panamaCity = { lat: 8.9936, lng: -79.5197 };
+            
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12,
+                center: panamaCity,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: true,
+                styles: [
+                    {
+                        "featureType": "all",
+                        "elementType": "geometry",
+                        "stylers": [{"color": "#1a1a2e"}]
+                    },
+                    {
+                        "featureType": "water",
+                        "elementType": "geometry",
+                        "stylers": [{"color": "#0f0f1e"}]
+                    },
+                    {
+                        "featureType": "road",
+                        "elementType": "geometry",
+                        "stylers": [{"color": "#2d2d44"}]
+                    }
+                ]
+            });
+
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({
+                map: map,
+                suppressMarkers: false,
+                polylineOptions: {
+                    strokeColor: '#c5a572',
+                    strokeWeight: 4
+                }
+            });
+
+            // Click en el mapa
+            map.addListener('click', function(e) {
+                if (currentLocationMode) {
+                    setLocation(e.latLng);
+                }
+            });
+
+            // Autocompletar para los campos de texto
+            const pickupInput = document.getElementById('pickupLocation');
+            const destInput = document.getElementById('destination');
+            
+            const pickupAutocomplete = new google.maps.places.Autocomplete(pickupInput, {
+                componentRestrictions: { country: 'pa' }
+            });
+            
+            const destAutocomplete = new google.maps.places.Autocomplete(destInput, {
+                componentRestrictions: { country: 'pa' }
+            });
+
+            pickupAutocomplete.addListener('place_changed', function() {
+                const place = pickupAutocomplete.getPlace();
+                if (place.geometry) {
+                    pickupCoords = {
+                        lat: place.geometry.location.lat(),
+                        lng: place.geometry.location.lng()
+                    };
+                    updatePickupMarker();
+                }
+            });
+
+            destAutocomplete.addListener('place_changed', function() {
+                const place = destAutocomplete.getPlace();
+                if (place.geometry) {
+                    destinationCoords = {
+                        lat: place.geometry.location.lat(),
+                        lng: place.geometry.location.lng()
+                    };
+                    updateDestinationMarker();
+                }
+            });
+        }
+
+        // ==========================================
+        // FUNCIONES DE UBICACIÓN
+        // ==========================================
+        function setLocationMode(mode) {
+            currentLocationMode = mode;
+            document.getElementById('setPickupBtn').classList.remove('active');
+            document.getElementById('setDestBtn').classList.remove('active');
+            
+            if (mode === 'pickup') {
+                document.getElementById('setPickupBtn').classList.add('active');
+            } else if (mode === 'destination') {
+                document.getElementById('setDestBtn').classList.add('active');
+            }
+        }
+
+        function setLocation(latLng) {
+            const geocoder = new google.maps.Geocoder();
+            
+            geocoder.geocode({ location: latLng }, (results, status) => {
+                if (status === 'OK' && results[0]) {
+                    const address = results[0].formatted_address;
+                    
+                    if (currentLocationMode === 'pickup') {
+                        pickupCoords = { lat: latLng.lat(), lng: latLng.lng() };
+                        document.getElementById('pickupLocation').value = address;
+                        updatePickupMarker();
+                        currentLocationMode = null;
+                        document.getElementById('setPickupBtn').classList.remove('active');
+                    } else if (currentLocationMode === 'destination') {
+                        destinationCoords = { lat: latLng.lat(), lng: latLng.lng() };
+                        document.getElementById('destination').value = address;
+                        updateDestinationMarker();
+                        currentLocationMode = null;
+                        document.getElementById('setDestBtn').classList.remove('active');
+                    }
+                }
+            });
+        }
+
+        function useMyLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const pos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        
+                        map.setCenter(pos);
+                        map.setZoom(15);
+                        
+                        const geocoder = new google.maps.Geocoder();
+                        geocoder.geocode({ location: pos }, (results, status) => {
+                            if (status === 'OK' && results[0]) {
+                                pickupCoords = pos;
+                                document.getElementById('pickupLocation').value = results[0].formatted_address;
+                                updatePickupMarker();
+                            }
+                        });
+                    },
+                    () => {
+                        alert(currentLang === 'es' 
+                            ? 'No se pudo obtener su ubicación' 
+                            : 'Could not get your location');
+                    }
+                );
+            }
+        }
+
+        function updatePickupMarker() {
+            if (pickupMarker) {
+                pickupMarker.setMap(null);
+            }
+            if (pickupCoords) {
+                pickupMarker = new google.maps.Marker({
+                    position: pickupCoords,
+                    map: map,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 10,
+                        fillColor: '#c5a572',
+                        fillOpacity: 1,
+                        strokeColor: '#ffffff',
+                        strokeWeight: 2
+                    },
+                    title: 'Punto de Recogida'
+                });
+                
+                if (destinationCoords) {
+                    calculateRoute();
+                }
+            }
+        }
+
+        function updateDestinationMarker() {
+            if (destinationMarker) {
+                destinationMarker.setMap(null);
+            }
+            if (destinationCoords) {
+                destinationMarker = new google.maps.Marker({
+                    position: destinationCoords,
+                    map: map,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 10,
+                        fillColor: '#ecc94b',
+                        fillOpacity: 1,
+                        strokeColor: '#ffffff',
+                        strokeWeight: 2
+                    },
+                    title: 'Destino'
+                });
+                
+                if (pickupCoords) {
+                    calculateRoute();
+                }
+            }
+        }
+
+        function calculateRoute() {
+            if (!pickupCoords || !destinationCoords) return;
+            
+            const request = {
+                origin: pickupCoords,
+                destination: destinationCoords,
+                travelMode: 'DRIVING'
+            };
+            
+            directionsService.route(request, (result, status) => {
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(result);
+                    
+                    const route = result.routes[0];
+                    const distance = route.legs[0].distance.value / 1000; // km
+                    const duration = route.legs[0].duration.value / 60; // min
+                    
+                    // Calcular precio basado en distancia
+                    let price = 10 + (distance * 1.5); // Tarifa base + por km
+                    price = Math.round(price * 100) / 100;
+                    
+                    document.getElementById('distanceValue').textContent = distance.toFixed(1) + ' km';
+                    document.getElementById('durationValue').textContent = Math.round(duration) + ' min';
+                    document.getElementById('priceDisplay').textContent = '$' + price.toFixed(2);
+                    document.getElementById('quoteResult').style.display = 'block';
+                }
+            });
+        }
+
+        // ==========================================
+        // GENERACIÓN DE SERVICIOS
+        // ==========================================
+        function generateServiceCards() {
+            generateAirportCards();
+            generatePanoramicCards();
+            generateLocalCards();
+        }
+
+        function generateAirportCards() {
+            const container = document.getElementById('airportServices');
+            const services = airportServices[currentLang];
+            container.innerHTML = '';
+            
+            services.forEach(service => {
+                const card = document.createElement('div');
+                card.className = 'service-card';
+                card.onclick = () => selectService('airport', service);
+                card.innerHTML = `
+                    <h3>${service.name}</h3>
+                    <div class="price">$${service.price}</div>
+                    <p class="description">
+                        ${currentLang === 'es' ? 'Incluye' : 'Includes'} ${service.maxBase} ${currentLang === 'es' ? 'personas' : 'people'}
+                    </p>
+                    <p class="additional-info">
+                        +$${service.extraPerson} ${currentLang === 'es' ? 'por persona adicional' : 'per additional person'}
+                    </p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function generatePanoramicCards() {
+            const container = document.getElementById('panoramicServices');
+            const services = panoramicServices[currentLang];
+            container.innerHTML = '';
+            
+            services.forEach(service => {
+                const card = document.createElement('div');
+                card.className = 'service-card';
+                card.onclick = () => selectService('panoramic', service);
+                card.innerHTML = `
+                    <h3>${service.name}</h3>
+                    <div class="price">$${service.price}</div>
+                    <p class="description">
+                        ${currentLang === 'es' ? 'Duración:' : 'Duration:'} ${service.duration}<br>
+                        ${currentLang === 'es' ? 'Hasta' : 'Up to'} ${service.maxBase} ${currentLang === 'es' ? 'personas' : 'people'}
+                    </p>
+                    <p class="additional-info">
+                        +$${service.extraPerson} ${currentLang === 'es' ? 'por persona adicional' : 'per additional person'}
+                    </p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function generateLocalCards() {
+            const container = document.getElementById('localServices');
+            const services = localServices[currentLang];
+            container.innerHTML = '';
+            
+            services.forEach(service => {
+                const card = document.createElement('div');
+                card.className = 'service-card';
+                card.onclick = () => selectService('local', service);
+                card.innerHTML = `
+                    <h3>${service.name}</h3>
+                    <div class="price">$${service.pricePerPerson}/${currentLang === 'es' ? 'persona' : 'person'}</div>
+                    <p class="description">
+                        ${currentLang === 'es' ? 'Precio por persona' : 'Price per person'}
+                    </p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // ==========================================
+        // SELECCIÓN DE SERVICIOS
+        // ==========================================
+        function selectService(type, service) {
+            currentServiceType = type;
+            selectedServiceOption = service;
+            showBookingForm(type);
+        }
+
+        function showBookingForm(type) {
+            document.getElementById('bookingModal').style.display = 'block';
+            
+            // Mostrar/ocultar secciones según el tipo
+            if (type === 'airport' || type === 'panoramic') {
+                document.getElementById('additionalPeopleSection').classList.remove('hidden');
+                document.getElementById('peopleCountSection').classList.add('hidden');
+            } else if (type === 'local') {
+                document.getElementById('peopleCountSection').classList.remove('hidden');
+                document.getElementById('additionalPeopleSection').classList.add('hidden');
+            } else {
+                // Regular trip from quote
+                document.getElementById('additionalPeopleSection').classList.add('hidden');
+                document.getElementById('peopleCountSection').classList.add('hidden');
+            }
+            
+            calculateTotal();
+        }
+
+        function closeBookingModal() {
+            document.getElementById('bookingModal').style.display = 'none';
+        }
+
+        // ==========================================
+        // CÁLCULOS DE PRECIO
+        // ==========================================
+        function calculateTotal() {
+            let basePrice = 0;
+            let extraPeople = 0;
+            let extraCost = 0;
+            
+            if (currentServiceType === 'airport' || currentServiceType === 'panoramic') {
+                if (selectedServiceOption) {
+                    basePrice = selectedServiceOption.price;
+                    extraPeople = parseInt(document.getElementById('additionalPeople').value) || 0;
+                    extraCost = extraPeople * selectedServiceOption.extraPerson;
+                }
+            } else if (currentServiceType === 'local') {
+                if (selectedServiceOption) {
+                    const peopleCount = parseInt(document.getElementById('peopleCount').value) || 1;
+                    basePrice = selectedServiceOption.pricePerPerson * peopleCount;
+                }
+            } else {
+                // Regular trip from quote
+                const priceDisplay = document.getElementById('priceDisplay').textContent;
+                basePrice = parseFloat(priceDisplay.replace('$', '')) || 0;
+            }
+            
+            const subtotal = basePrice + extraCost;
+            const needsInvoice = document.getElementById('needsInvoice').checked;
+            const itbms = needsInvoice ? subtotal * 0.07 : 0;
+            const total = subtotal + itbms;
+            
+            // Actualizar displays
+            document.getElementById('basePriceValue').textContent = '$' + basePrice.toFixed(2);
+            document.getElementById('extraPeopleValue').textContent = '$' + extraCost.toFixed(2);
+            document.getElementById('subtotalValue').textContent = '$' + subtotal.toFixed(2);
+            document.getElementById('itbmsValue').textContent = '$' + itbms.toFixed(2);
+            document.getElementById('totalValue').textContent = '$' + total.toFixed(2);
+            
+            // Mostrar/ocultar filas
+            document.getElementById('extraPeopleRow').style.display = extraCost > 0 ? 'flex' : 'none';
+            document.getElementById('itbmsRow').style.display = needsInvoice ? 'flex' : 'none';
+        }
+
+        function toggleInvoiceFields() {
+            const needsInvoice = document.getElementById('needsInvoice').checked;
+            document.getElementById('invoiceFields').classList.toggle('hidden', !needsInvoice);
+            calculateTotal();
+        }
+
+        // ==========================================
+        // TABS Y NAVEGACIÓN
+        // ==========================================
+        function switchTab(tab) {
+            // Remove active from all tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Add active to selected
+            event.target.classList.add('active');
+            document.getElementById(tab + '-tab').classList.add('active');
+        }
+
+        // ==========================================
+        // IDIOMA
+        // ==========================================
+        function toggleLanguage() {
+            currentLang = currentLang === 'es' ? 'en' : 'es';
+            updateLanguage();
+            generateServiceCards();
+        }
+
+        function updateLanguage() {
+            const lang = translations[currentLang];
+            Object.keys(lang).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (element.tagName === 'INPUT' || element.tagName === 'BUTTON') {
+                        if (element.type !== 'radio' && element.type !== 'checkbox') {
+                            element.value = lang[key];
+                        }
+                    } else {
+                        element.innerHTML = lang[key];
+                    }
+                }
+            });
+            document.documentElement.lang = currentLang;
+        }
+
+        // ==========================================
+        // FORMULARIO DE RESERVA
+        // ==========================================
+        document.getElementById('quoteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (pickupCoords && destinationCoords) {
+                calculateRoute();
+            } else {
+                alert(currentLang === 'es' 
+                    ? 'Por favor seleccione ubicaciones en el mapa' 
+                    : 'Please select locations on the map');
+            }
+        });
+
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                pickupLocation: document.getElementById('pickupLocation').value,
+                destination: document.getElementById('destination').value,
+                tripDate: document.getElementById('tripDate').value,
+                tripTime: document.getElementById('tripTime').value,
+                paymentMethod: document.querySelector('input[name="paymentMethod"]:checked').value,
+                needsInvoice: document.getElementById('needsInvoice').checked,
+                ruc: document.getElementById('ruc').value,
+                dv: document.getElementById('dv').value,
+                serviceType: currentServiceType,
+                selectedService: selectedServiceOption,
+                additionalPeople: document.getElementById('additionalPeople')?.value || 0,
+                peopleCount: document.getElementById('peopleCount')?.value || 0,
+                totalPrice: document.getElementById('totalValue').textContent
+            };
+            
+            generateInvoice(formData);
+            
+            const successMsg = document.getElementById('successMessage');
+            successMsg.innerHTML = currentLang === 'es' 
+                ? '✅ ¡Reserva confirmada! Recibirá un correo con todos los detalles.' 
+                : '✅ Reservation confirmed! You will receive an email with all details.';
+            successMsg.style.display = 'block';
+            
+            setTimeout(() => {
+                closeBookingModal();
+                this.reset();
+                successMsg.style.display = 'none';
+            }, 3000);
+        });
+
+        // ==========================================
+        // GENERACIÓN DE PDF
+        // ==========================================
+        function generateInvoice(data) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const companyInfo = {
+                businessName: "TRANSPORTE VIP S.A.",
+                ownerName: "Juan Carlos Rodríguez",
+                ownerRUC: "8-123-4567",
+                ownerDV: "12",
+                companyRUC: "123456-1-123456",
+                avisoOperacion: "AO-2024-12345"
+            };
+            
+            doc.setTextColor(197, 165, 114);
+            doc.setFontSize(24);
+            doc.setFont(undefined, 'bold');
+            doc.text('TRANSPORTE VIP', 105, 20, { align: 'center' });
+            
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(data.needsInvoice ? 'Factura Fiscal' : 'Factura Informal', 105, 28, { align: 'center' });
+            
+            doc.setFontSize(9);
+            doc.setTextColor(80);
+            const yStart = 40;
+            doc.text(`Razón Social: ${companyInfo.businessName}`, 20, yStart);
+            doc.text(`RUC Empresa: ${companyInfo.companyRUC}`, 20, yStart + 5);
+            doc.text(`Aviso de Operación: ${companyInfo.avisoOperacion}`, 20, yStart + 10);
+            doc.text(`Propietario: ${companyInfo.ownerName}`, 20, yStart + 15);
+            doc.text(`RUC Propietario: ${companyInfo.ownerRUC} DV: ${companyInfo.ownerDV}`, 20, yStart + 20);
+            doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 150, yStart);
+            
+            doc.setDrawColor(197, 165, 114);
+            doc.line(20, yStart + 28, 190, yStart + 28);
+            
+            doc.setFontSize(11);
+            doc.setTextColor(0);
+            doc.setFont(undefined, 'bold');
+            doc.text('INFORMACIÓN DEL CLIENTE', 20, yStart + 38);
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            const clientY = yStart + 45;
+            doc.text(`Nombre: ${data.firstName} ${data.lastName}`, 20, clientY);
+            doc.text(`Teléfono: ${data.phone}`, 20, clientY + 6);
+            doc.text(`Email: ${data.email}`, 20, clientY + 12);
+            
+            if (data.needsInvoice) {
+                doc.text(`RUC: ${data.ruc}  DV: ${data.dv}`, 20, clientY + 18);
+            }
+            
+            doc.setFont(undefined, 'bold');
+            doc.text('DETALLES DEL SERVICIO', 20, clientY + 30);
+            
+            doc.setFont(undefined, 'normal');
+            const serviceY = clientY + 37;
+            if (data.selectedService) {
+                doc.text(`Servicio: ${data.selectedService.name}`, 20, serviceY);
+            }
+            doc.text(`Recogida: ${data.pickupLocation}`, 20, serviceY + 6);
+            doc.text(`Destino: ${data.destination}`, 20, serviceY + 12);
+            doc.text(`Fecha: ${data.tripDate}`, 20, serviceY + 18);
+            doc.text(`Hora: ${data.tripTime}`, 20, serviceY + 24);
+            doc.text(`Método de Pago: ${data.paymentMethod}`, 20, serviceY + 30);
+            
+            doc.setDrawColor(197, 165, 114);
+            doc.line(20, serviceY + 38, 190, serviceY + 38);
+            
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(197, 165, 114);
+            doc.text(`TOTAL: ${data.totalPrice}`, 105, serviceY + 48, { align: 'center' });
+            
+            if (data.needsInvoice) {
+                doc.setFontSize(8);
+                doc.setTextColor(100);
+                doc.setFont(undefined, 'italic');
+                doc.text('Incluye 7% ITBMS', 105, serviceY + 55, { align: 'center' });
+            }
+            
+            doc.setFontSize(9);
+            doc.setTextColor(80);
+            doc.text('Gracias por confiar en Transporte VIP', 105, 280, { align: 'center' });
+            
+            doc.save(`Factura_TransporteVIP_${data.firstName}_${data.lastName}.pdf`);
+        }
+
+        // ==========================================
+        // PAYMENT METHOD SELECTION
+        // ==========================================
+        document.querySelectorAll('.payment-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                this.querySelector('input[type="radio"]').checked = true;
+            });
+        });
+
+        // ==========================================
+        // CAROUSEL
+        // ==========================================
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.carousel-slide');
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            currentSlide = (n + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+
+        setInterval(() => {
+            showSlide(currentSlide + 1);
+        }, 5000);
+
+        // ==========================================
+        // INICIALIZACIÓN
+        // ==========================================
+        window.addEventListener('load', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('tripDate').setAttribute('min', today);
+            
+            generateServiceCards();
+        });
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('bookingModal');
+            if (event.target == modal) {
+                closeBookingModal();
+            }
+        }
+    </script>
+</body>
+</html>

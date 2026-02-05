@@ -1711,17 +1711,124 @@
         // ==========================================
         // GENERACIÓN DE PDF
         // ==========================================
-        function generateInvoice(data) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            const companyInfo = {
-                businessName: "TRANSPORTE VIP S.A.",
-                ownerName: "Juan Carlos Rodríguez",
-                ownerRUC: "8-123-4567",
-                ownerDV: "12",
-                companyRUC: "123456-1-123456",
-                avisoOperacion: "AO-2024-12345"
+        // ==========================================
+// CONFIGURACIÓN EMAILJS
+// ==========================================
+// Reemplaza estos valores con los tuyos de EmailJS
+const EMAILJS_CONFIG = {
+    USER_ID: 'TU_USER_ID',              // De Account > API Keys
+    SERVICE_ID: 'TU_SERVICE_ID',         // De Email Services
+    TEMPLATE_CLIENTE: 'confirmacion_cliente',
+    TEMPLATE_CONDUCTOR: 'notificacion_conductor',
+    CONDUCTOR_EMAIL: 'conductor@transportevip.com'
+};
+
+// Inicializar EmailJS cuando cargue la página
+(function() {
+    emailjs.init(EMAILJS_CONFIG.USER_ID);
+})();
+
+// ==========================================
+// FUNCIÓN MEJORADA DE ENVÍO DE EMAILS
+// ==========================================
+function enviarEmails(data, pdfBase64) {
+    // Preparar datos comunes
+    const emailData = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        phone: data.phone,
+        email: data.email,
+        pickupLocation: data.pickupLocation,
+        destination: data.destination,
+        tripDate: data.tripDate,
+        tripTime: data.tripTime,
+        paymentMethod: data.paymentMethod,
+        estimatedPrice: data.estimatedPrice.toFixed(2),
+        driverName: "Juan Carlos Rodríguez",
+        driverPhone: "+507 6123-4567",
+        driverLicense: "8-123-4567",
+        vehicleInfo: "Toyota Camry 2023 - Negro",
+        needsInvoice: data.needsInvoice,
+        ruc: data.ruc || '',
+        dv: data.dv || '',
+        additionalPeople: data.additionalPeople || 0
+    };
+    
+    // 1. Enviar confirmación al cliente
+    emailjs.send(
+        EMAILJS_CONFIG.SERVICE_ID,
+        EMAILJS_CONFIG.TEMPLATE_CLIENTE,
+        {
+            ...emailData,
+            to_email: data.email,
+            to_name: `${data.firstName} ${data.lastName}`
+        }
+    )
+    .then(function(response) {
+        console.log('✅ Email enviado al cliente:', response);
+        
+        // 2. Enviar notificación al conductor
+        return emailjs.send(
+            EMAILJS_CONFIG.SERVICE_ID,
+            EMAILJS_CONFIG.TEMPLATE_CONDUCTOR,
+            {
+                ...emailData,
+                to_email: EMAILJS_CONFIG.CONDUCTOR_EMAIL,
+                to_name: 'Conductor'
+            }
+        );
+    })
+    .then(function(response) {
+        console.log('✅ Email enviado al conductor:', response);
+        mostrarMensajeExito();
+    })
+    .catch(function(error) {
+        console.error('❌ Error al enviar emails:', error);
+        alert('Hubo un error al enviar los emails. Por favor contacte directamente.');
+    });
+}
+
+// ==========================================
+// FUNCIÓN DE ÉXITO
+// ==========================================
+function mostrarMensajeExito() {
+    const successMsg = document.getElementById('successMessage');
+    successMsg.innerHTML = `
+        <h3>✅ ¡Reserva Confirmada!</h3>
+        <p>Hemos enviado la confirmación a su correo electrónico.</p>
+        <p>Recibirá un PDF con todos los detalles del viaje.</p>
+    `;
+    successMsg.style.display = 'block';
+    
+    // Cerrar modal después de 4 segundos
+    setTimeout(() => {
+        closeBookingModal();
+        document.getElementById('bookingForm').reset();
+        successMsg.style.display = 'none';
+    }, 4000);
+}
+
+// ==========================================
+// ACTUALIZAR LA FUNCIÓN generateInvoice
+// ==========================================
+// Busca la función generateInvoice en tu código y reemplázala con esta:
+
+function generateInvoice(data) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Company information
+    const companyInfo = {
+        businessName: "TRANSPORTE VIP S.A.",
+        ownerName: "Juan Carlos Rodríguez",
+        ownerRUC: "8-123-4567",
+        ownerDV: "12",
+        companyRUC: "123456-1-123456",
+        avisoOperacion: "AO-2024-12345"
+    };
+    
+    // [MANTÉN TODO EL CÓDIGO DE GENERACIÓN DEL PDF AQUÍ]
+    // ... (el código que ya tienes para crear el PDF)
             };
             
             doc.setTextColor(197, 165, 114);
@@ -1796,6 +1903,11 @@
             doc.text('Gracias por confiar en Transporte VIP', 105, 280, { align: 'center' });
             
             doc.save(`Factura_TransporteVIP_${data.firstName}_${data.lastName}.pdf`);
+             // Convertir PDF a base64 para enviar por email
+    const pdfBase64 = doc.output('datauristring');
+    
+    // Enviar emails
+    enviarEmails(data, pdfBase64);
         }
 
         // ==========================================

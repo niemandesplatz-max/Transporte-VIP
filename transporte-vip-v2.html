@@ -1717,10 +1717,10 @@
 // Reemplaza estos valores con los tuyos de EmailJS
 const EMAILJS_CONFIG = {
     USER_ID: 'TU_USER_ID',              // De Account > API Keys
-    SERVICE_ID: 'TU_SERVICE_ID',         // De Email Services
-    TEMPLATE_CLIENTE: 'confirmacion_cliente',
-    TEMPLATE_CONDUCTOR: 'notificacion_conductor',
-    CONDUCTOR_EMAIL: 'conductor@transportevip.com'
+    SERVICE_ID: 'service_t7l409h',         // De Email Services
+    TEMPLATE_CLIENTE: 'template_7mne3bb',
+    TEMPLATE_CONDUCTOR: 'template_5h2vus5',
+    CONDUCTOR_EMAIL: 'jguerra0322@gmail.com'
 };
 
 // Inicializar EmailJS cuando cargue la página
@@ -1744,9 +1744,9 @@ function enviarEmails(data, pdfBase64) {
         tripTime: data.tripTime,
         paymentMethod: data.paymentMethod,
         estimatedPrice: data.estimatedPrice.toFixed(2),
-        driverName: "Juan Carlos Rodríguez",
-        driverPhone: "+507 6123-4567",
-        driverLicense: "8-123-4567",
+        driverName: "Jose Guerra Nuñez",
+        driverPhone: "+507 6288-0950",
+        driverLicense: "4-244-737",
         vehicleInfo: "Toyota Camry 2023 - Negro",
         needsInvoice: data.needsInvoice,
         ruc: data.ruc || '',
